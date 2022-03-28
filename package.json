@@ -1,14 +1,14 @@
 {
-  "name": "@rari-capital/solmate",
+  "name": "@defi-wonderland/isolmate",
   "license": "AGPL-3.0-only",
-  "version": "6.2.0",
-  "description": "Modern, opinionated and gas optimized building blocks for smart contract development.",
+  "version": "6.2.0-beta2",
+  "description": "Solmate fork with interfaces",
   "files": [
     "src/**/*.sol"
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Rari-Capital/solmate.git"
+    "url": "git+https://github.com/defi-wonderland/isolmate.git"
   },
   "devDependencies": {
     "prettier": "^2.3.1",
