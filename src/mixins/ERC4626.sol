@@ -6,12 +6,12 @@ import {SafeTransferLib} from "../utils/SafeTransferLib.sol";
 import {FixedPointMathLib} from "../utils/FixedPointMathLib.sol";
 
 /// @notice Minimal ERC4626 tokenized Vault implementation.
-/// @author Solmate (https://github.com/Rari-Capital/solmate/blob/main/src/mixins/ERC4626.sol)
+/// @author Solmate (https://github.com/transmissions11/solmate/blob/main/src/mixins/ERC4626.sol)
 abstract contract ERC4626 is ERC20 {
     using SafeTransferLib for ERC20;
     using FixedPointMathLib for uint256;
 
-    /*///////////////////////////////////////////////////////////////
+    /*//////////////////////////////////////////////////////////////
                                  EVENTS
     //////////////////////////////////////////////////////////////*/
 
@@ -25,7 +25,7 @@ abstract contract ERC4626 is ERC20 {
         uint256 shares
     );
 
-    /*///////////////////////////////////////////////////////////////
+    /*//////////////////////////////////////////////////////////////
                                IMMUTABLES
     //////////////////////////////////////////////////////////////*/
 
@@ -39,7 +39,7 @@ abstract contract ERC4626 is ERC20 {
         asset = _asset;
     }
 
-    /*///////////////////////////////////////////////////////////////
+    /*//////////////////////////////////////////////////////////////
                         DEPOSIT/WITHDRAWAL LOGIC
     //////////////////////////////////////////////////////////////*/
 
@@ -115,8 +115,8 @@ abstract contract ERC4626 is ERC20 {
         asset.safeTransfer(receiver, assets);
     }
 
-    /*///////////////////////////////////////////////////////////////
-                           ACCOUNTING LOGIC
+    /*//////////////////////////////////////////////////////////////
+                            ACCOUNTING LOGIC
     //////////////////////////////////////////////////////////////*/
 
     function totalAssets() public view virtual returns (uint256);
@@ -153,7 +153,7 @@ abstract contract ERC4626 is ERC20 {
         return convertToAssets(shares);
     }
 
-    /*///////////////////////////////////////////////////////////////
+    /*//////////////////////////////////////////////////////////////
                      DEPOSIT/WITHDRAWAL LIMIT LOGIC
     //////////////////////////////////////////////////////////////*/
 
@@ -173,8 +173,8 @@ abstract contract ERC4626 is ERC20 {
         return balanceOf[owner];
     }
 
-    /*///////////////////////////////////////////////////////////////
-                         INTERNAL HOOKS LOGIC
+    /*//////////////////////////////////////////////////////////////
+                          INTERNAL HOOKS LOGIC
     //////////////////////////////////////////////////////////////*/
 
     function beforeWithdraw(uint256 assets, uint256 shares) internal virtual {}

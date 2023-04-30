@@ -4,19 +4,18 @@ pragma solidity >=0.8.0;
 import {IERC20} from "../interfaces/tokens/IERC20.sol";
 
 /// @notice Safe ETH and ERC20 transfer library that gracefully handles missing return values.
-/// @author Solmate (https://github.com/Rari-Capital/solmate/blob/main/src/utils/SafeTransferLib.sol)
+/// @author Solmate (https://github.com/transmissions11/solmate/blob/main/src/utils/SafeTransferLib.sol)
 /// @dev Use with caution! Some functions in this library knowingly create dirty bits at the destination of the free memory pointer.
 /// @dev Note that none of the functions in this library check that a token has code at all! That responsibility is delegated to the caller.
 library SafeTransferLib {
-    event Debug(bool one, bool two, uint256 retsize);
-
-    /*///////////////////////////////////////////////////////////////
-                            ETH OPERATIONS
+    /*//////////////////////////////////////////////////////////////
+                             ETH OPERATIONS
     //////////////////////////////////////////////////////////////*/
 
     function safeTransferETH(address to, uint256 amount) internal {
         bool success;
 
+        /// @solidity memory-safe-assembly
         assembly {
             // Transfer the ETH and store if it succeeded or not.
             success := call(gas(), to, amount, 0, 0, 0, 0)
@@ -25,8 +24,8 @@ library SafeTransferLib {
         require(success, "ETH_TRANSFER_FAILED");
     }
 
-    /*///////////////////////////////////////////////////////////////
-                           ERC20 OPERATIONS
+    /*//////////////////////////////////////////////////////////////
+                            ERC20 OPERATIONS
     //////////////////////////////////////////////////////////////*/
 
     function safeTransferFrom(
@@ -37,6 +36,7 @@ library SafeTransferLib {
     ) internal {
         bool success;
 
+        /// @solidity memory-safe-assembly
         assembly {
             // Get a pointer to some free memory.
             let freeMemoryPointer := mload(0x40)
@@ -69,6 +69,7 @@ library SafeTransferLib {
     ) internal {
         bool success;
 
+        /// @solidity memory-safe-assembly
         assembly {
             // Get a pointer to some free memory.
             let freeMemoryPointer := mload(0x40)
@@ -100,6 +101,7 @@ library SafeTransferLib {
     ) internal {
         bool success;
 
+        /// @solidity memory-safe-assembly
         assembly {
             // Get a pointer to some free memory.
             let freeMemoryPointer := mload(0x40)
