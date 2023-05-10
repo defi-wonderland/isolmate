@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-pragma solidity 0.8.10;
+pragma solidity 0.8.15;
 
 import {DSTestPlus} from "./utils/DSTestPlus.sol";
 import {DSInvariantTest} from "./utils/DSInvariantTest.sol";
 
 import {MockERC20} from "./utils/mocks/MockERC20.sol";
-import {ERC20User} from "./utils/users/ERC20User.sol";
 
 contract ERC20Test is DSTestPlus {
     MockERC20 token;
@@ -55,34 +54,36 @@ contract ERC20Test is DSTestPlus {
     }
 
     function testTransferFrom() public {
-        ERC20User from = new ERC20User(token);
+        address from = address(0xABCD);
 
-        token.mint(address(from), 1e18);
+        token.mint(from, 1e18);
 
-        from.approve(address(this), 1e18);
+        hevm.prank(from);
+        token.approve(address(this), 1e18);
 
-        assertTrue(token.transferFrom(address(from), address(0xBEEF), 1e18));
+        assertTrue(token.transferFrom(from, address(0xBEEF), 1e18));
         assertEq(token.totalSupply(), 1e18);
 
-        assertEq(token.allowance(address(from), address(this)), 0);
+        assertEq(token.allowance(from, address(this)), 0);
 
-        assertEq(token.balanceOf(address(from)), 0);
+        assertEq(token.balanceOf(from), 0);
         assertEq(token.balanceOf(address(0xBEEF)), 1e18);
     }
 
     function testInfiniteApproveTransferFrom() public {
-        ERC20User from = new ERC20User(token);
+        address from = address(0xABCD);
 
-        token.mint(address(from), 1e18);
+        token.mint(from, 1e18);
 
-        from.approve(address(this), type(uint256).max);
+        hevm.prank(from);
+        token.approve(address(this), type(uint256).max);
 
-        assertTrue(token.transferFrom(address(from), address(0xBEEF), 1e18));
+        assertTrue(token.transferFrom(from, address(0xBEEF), 1e18));
         assertEq(token.totalSupply(), 1e18);
 
-        assertEq(token.allowance(address(from), address(this)), type(uint256).max);
+        assertEq(token.allowance(from, address(this)), type(uint256).max);
 
-        assertEq(token.balanceOf(address(from)), 0);
+        assertEq(token.balanceOf(from), 0);
         assertEq(token.balanceOf(address(0xBEEF)), 1e18);
     }
 
@@ -113,19 +114,25 @@ contract ERC20Test is DSTestPlus {
     }
 
     function testFailTransferFromInsufficientAllowance() public {
-        ERC20User from = new ERC20User(token);
+        address from = address(0xABCD);
 
-        token.mint(address(from), 1e18);
-        from.approve(address(this), 0.9e18);
-        token.transferFrom(address(from), address(0xBEEF), 1e18);
+        token.mint(from, 1e18);
+
+        hevm.prank(from);
+        token.approve(address(this), 0.9e18);
+
+        token.transferFrom(from, address(0xBEEF), 1e18);
     }
 
     function testFailTransferFromInsufficientBalance() public {
-        ERC20User from = new ERC20User(token);
+        address from = address(0xABCD);
 
-        token.mint(address(from), 0.9e18);
-        from.approve(address(this), 1e18);
-        token.transferFrom(address(from), address(0xBEEF), 1e18);
+        token.mint(from, 0.9e18);
+
+        hevm.prank(from);
+        token.approve(address(this), 1e18);
+
+        token.transferFrom(from, address(0xBEEF), 1e18);
     }
 
     function testFailPermitBadNonce() public {
@@ -165,6 +172,7 @@ contract ERC20Test is DSTestPlus {
     }
 
     function testFailPermitPastDeadline() public {
+        uint256 oldTimestamp = block.timestamp;
         uint256 privateKey = 0xBEEF;
         address owner = hevm.addr(privateKey);
 
@@ -174,12 +182,13 @@ contract ERC20Test is DSTestPlus {
                 abi.encodePacked(
                     "\x19\x01",
                     token.DOMAIN_SEPARATOR(),
-                    keccak256(abi.encode(PERMIT_TYPEHASH, owner, address(0xCAFE), 1e18, 0, block.timestamp - 1))
+                    keccak256(abi.encode(PERMIT_TYPEHASH, owner, address(0xCAFE), 1e18, 0, oldTimestamp))
                 )
             )
         );
 
-        token.permit(owner, address(0xCAFE), 1e18, block.timestamp - 1, v, r, s);
+        hevm.warp(block.timestamp + 1);
+        token.permit(owner, address(0xCAFE), 1e18, oldTimestamp, v, r, s);
     }
 
     function testFailPermitReplay() public {
@@ -260,22 +269,23 @@ contract ERC20Test is DSTestPlus {
     ) public {
         amount = bound(amount, 0, approval);
 
-        ERC20User from = new ERC20User(token);
+        address from = address(0xABCD);
 
-        token.mint(address(from), amount);
+        token.mint(from, amount);
 
-        from.approve(address(this), approval);
+        hevm.prank(from);
+        token.approve(address(this), approval);
 
-        assertTrue(token.transferFrom(address(from), to, amount));
+        assertTrue(token.transferFrom(from, to, amount));
         assertEq(token.totalSupply(), amount);
 
-        uint256 app = address(from) == address(this) || approval == type(uint256).max ? approval : approval - amount;
-        assertEq(token.allowance(address(from), address(this)), app);
+        uint256 app = from == address(this) || approval == type(uint256).max ? approval : approval - amount;
+        assertEq(token.allowance(from, address(this)), app);
 
-        if (address(from) == to) {
-            assertEq(token.balanceOf(address(from)), amount);
+        if (from == to) {
+            assertEq(token.balanceOf(from), amount);
         } else {
-            assertEq(token.balanceOf(address(from)), 0);
+            assertEq(token.balanceOf(from), 0);
             assertEq(token.balanceOf(to), amount);
         }
     }
@@ -338,11 +348,14 @@ contract ERC20Test is DSTestPlus {
     ) public {
         amount = bound(amount, approval + 1, type(uint256).max);
 
-        ERC20User from = new ERC20User(token);
+        address from = address(0xABCD);
 
-        token.mint(address(from), amount);
-        from.approve(address(this), approval);
-        token.transferFrom(address(from), to, amount);
+        token.mint(from, amount);
+
+        hevm.prank(from);
+        token.approve(address(this), approval);
+
+        token.transferFrom(from, to, amount);
     }
 
     function testFailTransferFromInsufficientBalance(
@@ -352,11 +365,14 @@ contract ERC20Test is DSTestPlus {
     ) public {
         sendAmount = bound(sendAmount, mintAmount + 1, type(uint256).max);
 
-        ERC20User from = new ERC20User(token);
+        address from = address(0xABCD);
 
-        token.mint(address(from), mintAmount);
-        from.approve(address(this), sendAmount);
-        token.transferFrom(address(from), to, sendAmount);
+        token.mint(from, mintAmount);
+
+        hevm.prank(from);
+        token.approve(address(this), sendAmount);
+
+        token.transferFrom(from, to, sendAmount);
     }
 
     function testFailPermitBadNonce(

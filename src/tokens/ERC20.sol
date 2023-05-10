@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity >=0.8.0;
 
-import '../interfaces/tokens/IERC20.sol';
+import "../interfaces/tokens/IERC20.sol";
 
 /// @notice Modern and gas efficient ERC20 + EIP-2612 implementation.
-/// @author Solmate (https://github.com/Rari-Capital/solmate/blob/main/src/tokens/ERC20.sol)
+/// @author Solmate (https://github.com/transmissions11/solmate/blob/main/src/tokens/ERC20.sol)
 /// @author Modified from Uniswap (https://github.com/Uniswap/uniswap-v2-core/blob/master/contracts/UniswapV2ERC20.sol)
 /// @dev Do not manually set balances without updating totalSupply, as the sum of all user balances must not exceed it.
 abstract contract ERC20 is IERC20 {
@@ -18,7 +18,7 @@ abstract contract ERC20 is IERC20 {
 
     uint8 public immutable decimals;
 
-    /*///////////////////////////////////////////////////////////////
+    /*//////////////////////////////////////////////////////////////
                               ERC20 STORAGE
     //////////////////////////////////////////////////////////////*/
 
@@ -28,8 +28,8 @@ abstract contract ERC20 is IERC20 {
 
     mapping(address => mapping(address => uint256)) public allowance;
 
-    /*///////////////////////////////////////////////////////////////
-                             EIP-2612 STORAGE
+    /*//////////////////////////////////////////////////////////////
+                            EIP-2612 STORAGE
     //////////////////////////////////////////////////////////////*/
 
     uint256 internal immutable INITIAL_CHAIN_ID;
@@ -38,7 +38,7 @@ abstract contract ERC20 is IERC20 {
 
     mapping(address => uint256) public nonces;
 
-    /*///////////////////////////////////////////////////////////////
+    /*//////////////////////////////////////////////////////////////
                                CONSTRUCTOR
     //////////////////////////////////////////////////////////////*/
 
@@ -55,8 +55,8 @@ abstract contract ERC20 is IERC20 {
         INITIAL_DOMAIN_SEPARATOR = computeDomainSeparator();
     }
 
-    /*///////////////////////////////////////////////////////////////
-                              ERC20 LOGIC
+    /*//////////////////////////////////////////////////////////////
+                               ERC20 LOGIC
     //////////////////////////////////////////////////////////////*/
 
     function approve(address spender, uint256 amount) public virtual returns (bool) {
@@ -103,8 +103,8 @@ abstract contract ERC20 is IERC20 {
         return true;
     }
 
-    /*///////////////////////////////////////////////////////////////
-                              EIP-2612 LOGIC
+    /*//////////////////////////////////////////////////////////////
+                             EIP-2612 LOGIC
     //////////////////////////////////////////////////////////////*/
 
     function permit(
@@ -170,8 +170,8 @@ abstract contract ERC20 is IERC20 {
             );
     }
 
-    /*///////////////////////////////////////////////////////////////
-                       INTERNAL MINT/BURN LOGIC
+    /*//////////////////////////////////////////////////////////////
+                        INTERNAL MINT/BURN LOGIC
     //////////////////////////////////////////////////////////////*/
 
     function _mint(address to, uint256 amount) internal virtual {
